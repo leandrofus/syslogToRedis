@@ -1,0 +1,14 @@
+{
+  "name": "syslogtorelyserver",
+  "author": {"name": "Leandro Fusco", "email": "leandrofusdev@gmail.com"},
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "lightweight syslog rely server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
+}
