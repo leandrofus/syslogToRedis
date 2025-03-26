@@ -1,6 +1,9 @@
 {
   "name": "syslogtorelyserver",
-  "author": {"name": "Leandro Fusco", "email": "leandrofusdev@gmail.com"},
+  "author": {
+    "name": "Leandro Fusco",
+    "email": "leandrofusdev@gmail.com"
+  },
   "version": "1.0.0",
   "license": "MIT",
   "description": "lightweight syslog rely server",
@@ -9,6 +12,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "redis": "^4.7.0"
   }
 }

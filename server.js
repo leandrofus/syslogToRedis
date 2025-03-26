@@ -2,19 +2,29 @@ const dgram = require("dgram");
 const net = require("net");
 const { createClient } = require("redis");
 const fs = require("fs");
+const dotnet = require('dotenv');
 
-const REDIS_HOST = "10.10.0.21";
-const REDIS_PORT = 6379;
-const REDIS_CHANNEL = "syslog";
+dotnet.config();
+console.log("Starting syslog relay");
+//redis server
+const REDIS_HOST = process.env.REDIS_HOST || "localhost";
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_CHANNEL = process.env.REDIS_CHANNEL || "syslog";
 
-const SYSLOG_HOST = "localhost";
-const SYSLOG_PORT = 515;
-const SYSLOG_PROTOCOL = "udp";
+//remote syslog server to send logs
+const SYSLOG_HOST = process.env.SYSLOG_HOST;
+const SYSLOG_PORT = process.env.SYSLOG_PORT || 514;
+const SYSLOG_PROTOCOL = process.env.SYSLOG_PROTOCOL || "tcp";
 
-const UDP_PORT = 514;
-const TCP_PORT = 514;
+console.log("REDIS_HOST:", REDIS_HOST);
+console.log("REDIS_PORT:", REDIS_PORT);
+console.log("REDIS_CHANNEL:", REDIS_CHANNEL);
+console.log("SYSLOG_HOST:", SYSLOG_HOST);
+console.log("SYSLOG_PORT:", SYSLOG_PORT);
+console.log("SYSLOG_PROTOCOL:", SYSLOG_PROTOCOL);
 
 const filePath = "output.log";
+
 const stream = fs.createWriteStream(filePath, { flags: "a" });
 
 function writeLine(line) {
@@ -33,6 +43,8 @@ const udpClient = dgram.createSocket("udp4");
 async function sendToRedis(message) {
     try {
         await redisPublisher.publish(REDIS_CHANNEL, message);
+        console.log(message);
+        
     } catch (error) {
         console.error("Error:", error);
     }
@@ -61,24 +73,22 @@ function startUdpServer() {
     const server = dgram.createSocket("udp4");
 
     server.on("message", (msg) => {
-        const logMessage = msg;
-        console.log(logMessage);
-        sendToRedis(msg.toString());
+        const logMessage = msg.toString();
+        sendToRedis(logMessage);
     });
 
-    server.bind(UDP_PORT);
+    server.bind(514);
 }
 
 function startTcpServer() {
     const server = net.createServer((socket) => {
         socket.on("data", (data) => {
             const logMessage = data.toString();
-            console.log(logMessage);
-            sendToRedis(data.toString());
+            sendToRedis(logMessage)
         });
     });
 
-    server.listen(TCP_PORT);
+    server.listen(514);
 }
 
 async function startRelay() {
