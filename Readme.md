@@ -1,4 +1,4 @@
-# Syslog To Rely Server 
+# Syslog Relay Service 
 
 ### lightweight tool to to forward syslog messages to an external server using redis
 
